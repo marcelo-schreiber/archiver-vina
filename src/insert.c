@@ -11,19 +11,22 @@
 // O conteúdo da área de diretório pode ser manipulado em memória RAM ou em disco, a critério do aluno.
 // O conteúdo dos membros do archive deve ser manipulado diretamente em disco, não sendo permitida a alocação de mais de 1.024 bytes de memória para manipulação dos conteúdos dos membros.
 
-header_t *initialize_header()
+file_metadata *initialize_header()
 {
-    header_t *header = malloc(sizeof(header_t));
+    file_metadata *header = malloc(sizeof(file_metadata));
+
+    header->name = NULL;
     header->uid = 0;
     header->permissions = 0;
     header->size = 0;
     header->date = 0;
     header->order = 0;
-    header->location = 0;
+    header->location = NULL;
+
     return header;
 }
 
-void print_header(header_t *header)
+void print_header(file_metadata *header)
 {
     // pretty print like ls -l
 
@@ -58,9 +61,9 @@ void print_header(header_t *header)
     printf(" %d\n", header->order);
 }
 
-header_t *insert_header(char *location, char *filename, unsigned int order)
+file_metadata *insert_header(char *location, char *filename, unsigned int order)
 {
-    header_t *header = initialize_header();
+    file_metadata *header = initialize_header();
 
     struct stat file_stat;
     stat(filename, &file_stat);
