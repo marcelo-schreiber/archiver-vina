@@ -5,7 +5,9 @@
 
 #define MAX_BUF_SIZE 1024
 
-file_metadata **read_headers(FILE *archiver, int num_of_files)
+#define min(a, b) ((a) < (b) ? (a) : (b))
+
+file_metadata **create_header_array(FILE *archiver, int num_of_files)
 {
   file_metadata **headers = malloc(sizeof(file_metadata *) * num_of_files);
 
@@ -18,8 +20,10 @@ file_metadata **read_headers(FILE *archiver, int num_of_files)
   for (int i = 0; i < num_of_files; i++)
   {
     file_metadata *header_read = initialize_header();
+
     fread(header_read, sizeof(file_metadata), 1, archiver);
     headers[i] = header_read;
+
     print_header(headers[i]);
   }
 
@@ -30,12 +34,11 @@ void extract_vpp(FILE *archiver)
 {
   rewind(archiver); // set file pointer to the beginning of the file (just in case)
 
-  // read archiver file
   unsigned int num_of_files = 0;
+
   fread(&num_of_files, sizeof(unsigned int), 1, archiver);
 
-  // store into array of files_metada
-  file_metadata **headers = read_headers(archiver, num_of_files);
+  file_metadata **headers = create_header_array(archiver, num_of_files);
 
   // extract files
   for (unsigned int i = 0; i < num_of_files; i++)
@@ -50,18 +53,19 @@ void extract_vpp(FILE *archiver)
       exit(1);
     }
 
+    // TODO: remove this
     strcpy(new_file_name, "new_");            // new file name will be new_<original_file_name>
     strcat(new_file_name, curr_header->name); // concatenate the original file name to the new file name
 
-    FILE *file = fopen(new_file_name, "wb+");
+    FILE *output_file = fopen(new_file_name, "wb+");
 
-    if (file == NULL)
+    if (output_file == NULL)
     {
       printf("Error creating file\n");
       exit(1);
     }
 
-    int size = curr_header->size;
+    int header_size = curr_header->size;
 
     char *buffer = malloc(sizeof(char) * MAX_BUF_SIZE);
 
@@ -71,22 +75,25 @@ void extract_vpp(FILE *archiver)
       exit(1);
     }
 
-    while (size > 0) // read the file in chunks of MAX_BUF_SIZE
+    while (header_size > 0) // read the file in chunks of MAX_BUF_SIZE
     {
-      if (size < MAX_BUF_SIZE) // if the remaining size is less than MAX_BUF_SIZE, read the remaining size
-      {
-        fread(buffer, sizeof(char), size, archiver);
-        fwrite(buffer, sizeof(char), size, file);
-        break; // break the loop since there is no more data to read
-      }
-      else
-      {
-        fread(buffer, sizeof(char), MAX_BUF_SIZE, archiver);
-        fwrite(buffer, sizeof(char), MAX_BUF_SIZE, file);
-      }
-      size -= MAX_BUF_SIZE;
+      int curr_buffer_size = min(header_size, MAX_BUF_SIZE);
+
+      fread(buffer, sizeof(char), curr_buffer_size, archiver);
+      fwrite(buffer, sizeof(char), curr_buffer_size, output_file);
+
+      header_size -= MAX_BUF_SIZE;
     }
+
+    free(buffer);
+    free(new_file_name);
+    fclose(output_file);
   }
+
+  for (unsigned int i = 0; i < num_of_files; i++)
+    free_header(headers[i]);
+
+  free(headers);
 }
 
 void decode(char *vina_filename)

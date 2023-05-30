@@ -26,6 +26,33 @@ file_metadata *initialize_header()
     return header;
 }
 
+void free_header(file_metadata *header)
+{
+    free(header->name);
+    free(header->location);
+    free(header);
+}
+
+file_metadata *insert_header(char *location, char *filename, unsigned int order)
+{
+    file_metadata *header = initialize_header();
+
+    struct stat file_stat;
+    stat(filename, &file_stat);
+
+    char *name = malloc(sizeof(char) * strlen(filename) + 1);
+    strcpy(name, filename);
+    header->name = name;
+    header->uid = file_stat.st_uid;
+    header->permissions = file_stat.st_mode;
+    header->size = file_stat.st_size;
+    header->date = file_stat.st_mtime;
+    header->order = order;
+    header->location = location;
+
+    return header;
+}
+
 void print_header(file_metadata *header)
 {
     // pretty print like ls -l
@@ -59,24 +86,4 @@ void print_header(file_metadata *header)
 
     // print header order
     printf(" %d\n", header->order);
-}
-
-file_metadata *insert_header(char *location, char *filename, unsigned int order)
-{
-    file_metadata *header = initialize_header();
-
-    struct stat file_stat;
-    stat(filename, &file_stat);
-
-    char *name = malloc(sizeof(char) * strlen(filename));
-    strcpy(name, filename);
-    header->name = name;
-    header->uid = file_stat.st_uid;
-    header->permissions = file_stat.st_mode;
-    header->size = file_stat.st_size;
-    header->date = file_stat.st_mtime;
-    header->order = order;
-    header->location = location;
-
-    return header;
 }
