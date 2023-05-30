@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "insert.h"
+#include "file_header.h"
 
 #define MAX_BUF_SIZE 1024
 
@@ -25,14 +25,14 @@ void extract_vpp(FILE *archiver)
     rewind(archiver);
 
     // read archiver file
-    int num_of_files = 0;
-    fread(&num_of_files, sizeof(int), 1, archiver);
+    unsigned int num_of_files = 0;
+    fread(&num_of_files, sizeof(unsigned int), 1, archiver);
 
     // store into array of files_metada
     file_metadata **headers = read_headers(archiver, num_of_files);
 
     // extract files
-    for (int i = 0; i < num_of_files; i++)
+    for (unsigned int i = 0; i < num_of_files; i++)
     {
         file_metadata *header = headers[i];
         char *new_file_name = malloc(sizeof(char) * strlen(header->name) + 4);
@@ -62,17 +62,24 @@ void extract_vpp(FILE *archiver)
     }
 }
 
-int main(void)
+void decode(char *vina_filename)
+{
+    FILE *archiver = fopen(vina_filename, "rb");
+    extract_vpp(archiver);
+    fclose(archiver);
+}
+
+void encode(char *vina_filename)
 {
     // create archiver file
-    FILE *archiver = fopen("vina.vpp", "wb+");
+    FILE *archiver = fopen(vina_filename, "wb+");
 
     char **file_names = malloc(sizeof(char *) * 2);
     file_names[0] = "LEIAME.md";
     file_names[1] = ".gitignore";
-    int i = 2;
-    fwrite(&i, sizeof(int), 1, archiver);
-    for (i = 0; i < 2; i++)
+    unsigned int files_count = 2;
+    fwrite(&files_count, sizeof(int), 1, archiver);
+    for (unsigned int i = 0; i < files_count; i++)
     {
         file_metadata *header = initialize_header();
         header = insert_header("./", file_names[i], i + 1);
@@ -81,20 +88,23 @@ int main(void)
     }
 
     // write the content of each file
-    for (i = 0; i < 2; i++)
+    for (unsigned int i = 0; i < files_count; i++)
     {
         FILE *file = fopen(file_names[i], "rb");
-        char *buffer = malloc(sizeof(char) * 1024);
+        char *buffer = malloc(sizeof(char) * MAX_BUF_SIZE);
         int size = 0;
-        while ((size = fread(buffer, sizeof(char), 1024, file)) > 0)
-        {
+        while ((size = fread(buffer, sizeof(char), MAX_BUF_SIZE, file)) > 0)
             fwrite(buffer, sizeof(char), size, archiver);
-        }
+
         fclose(file);
     }
 
-    extract_vpp(archiver);
     fclose(archiver);
+}
 
+int main(void)
+{
+    encode("vina.vpp");
+    decode("vina.vpp");
     return 0;
 }
