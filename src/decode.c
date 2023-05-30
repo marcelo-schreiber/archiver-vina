@@ -19,8 +19,8 @@ file_metadata **create_header_array(FILE *archiver, int num_of_files)
 
   for (int i = 0; i < num_of_files; i++)
   {
-    file_metadata *header_read = initialize_header();
 
+    file_metadata *header_read = initialize_header();
     fread(header_read, sizeof(file_metadata), 1, archiver);
     headers[i] = header_read;
 
@@ -45,7 +45,7 @@ void extract_vpp(FILE *archiver)
   {
     file_metadata *curr_header = headers[i];
 
-    char *new_file_name = malloc(sizeof(char) * strlen(curr_header->name) + 5);
+    char *new_file_name = malloc(sizeof(char) * strlen(curr_header->name) + 5 + 1);
 
     if (new_file_name == NULL)
     {
@@ -88,10 +88,9 @@ void extract_vpp(FILE *archiver)
     free(buffer);
     free(new_file_name);
     fclose(output_file);
+    free(curr_header->name);
+    free(curr_header);
   }
-
-  for (unsigned int i = 0; i < num_of_files; i++)
-    free_header(headers[i]);
 
   free(headers);
 }

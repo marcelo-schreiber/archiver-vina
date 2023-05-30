@@ -15,6 +15,12 @@ file_metadata *initialize_header()
 {
     file_metadata *header = malloc(sizeof(file_metadata));
 
+    if (header == NULL)
+    {
+        printf("Error allocating memory for header\n");
+        exit(1);
+    }
+
     header->name = NULL;
     header->uid = 0;
     header->permissions = 0;
@@ -28,15 +34,19 @@ file_metadata *initialize_header()
 
 void free_header(file_metadata *header)
 {
-    free(header->name);
-    free(header->location);
+    if (header == NULL)
+        return;
+
+    if (header->name != NULL)
+        free(header->name);
+    if (header->location != NULL)
+        free(header->location);
+
     free(header);
 }
 
-file_metadata *insert_header(char *location, char *filename, unsigned int order)
+void insert_header(file_metadata *header, char *location, char *filename, unsigned int order)
 {
-    file_metadata *header = initialize_header();
-
     struct stat file_stat;
     stat(filename, &file_stat);
 
@@ -49,8 +59,6 @@ file_metadata *insert_header(char *location, char *filename, unsigned int order)
     header->date = file_stat.st_mtime;
     header->order = order;
     header->location = location;
-
-    return header;
 }
 
 void print_header(file_metadata *header)

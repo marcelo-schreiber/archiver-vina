@@ -19,6 +19,6 @@ typedef struct file
 } file_metadata;
 
 file_metadata *initialize_header();
-file_metadata *insert_header(char *location, char *filename, unsigned int order);
+void insert_header(file_metadata *header, char *location, char *filename, unsigned int order);
 void print_header(file_metadata *header);
 void free_header(file_metadata *header);

@@ -43,14 +43,16 @@ void encode(char *vina_filename)
 
   fwrite(&files_count, sizeof(int), 1, archiver);
 
+  file_metadata *header = initialize_header();
+
   for (unsigned int i = 0; i < files_count; i++)
   {
-    file_metadata *header = insert_header("./", file_names[i], i + 1); // TODO: get file path from command line
+    insert_header(header, "./", file_names[i], i + 1); // TODO: get file path from command line
     print_header(header);
     fwrite(header, sizeof(file_metadata), 1, archiver);
-
-    free_header(header);
   }
+
+  free(header);
 
   create_files(files_count, file_names, archiver);
 
