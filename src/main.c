@@ -22,7 +22,7 @@ file_metadata **read_headers(FILE *archiver, int num_of_files)
 
 void extract_vpp(FILE *archiver)
 {
-    rewind(archiver);
+    rewind(archiver); // set file pointer to the beginning of the file (just in case)
 
     // read archiver file
     unsigned int num_of_files = 0;
@@ -34,19 +34,33 @@ void extract_vpp(FILE *archiver)
     // extract files
     for (unsigned int i = 0; i < num_of_files; i++)
     {
-        file_metadata *header = headers[i];
-        char *new_file_name = malloc(sizeof(char) * strlen(header->name) + 4);
-        strcpy(new_file_name, "new");
-        strcat(new_file_name, header->name);
+        file_metadata *curr_header = headers[i];
+
+        char *new_file_name = malloc(sizeof(char) * strlen(curr_header->name) + 5);
+
+        if (new_file_name == NULL)
+        {
+            printf("Error allocating memory for new file name\n");
+            exit(1);
+        }
+
+        strcpy(new_file_name, "new_");            // new file name will be new_<original_file_name>
+        strcat(new_file_name, curr_header->name); // concatenate the original file name to the new file name
 
         FILE *file = fopen(new_file_name, "wb+");
-        int size = header->size;
+        int size = curr_header->size;
 
         char *buffer = malloc(sizeof(char) * MAX_BUF_SIZE);
 
-        while (size > 0)
+        if (buffer == NULL)
         {
-            if (size < MAX_BUF_SIZE)
+            printf("Error allocating memory for buffer\n");
+            exit(1);
+        }
+
+        while (size > 0) // read the file in chunks of MAX_BUF_SIZE
+        {
+            if (size < MAX_BUF_SIZE) // if the remaining size is less than MAX_BUF_SIZE, read the remaining size
             {
                 fread(buffer, sizeof(char), size, archiver);
                 fwrite(buffer, sizeof(char), size, file);
