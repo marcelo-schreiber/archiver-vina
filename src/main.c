@@ -3,46 +3,63 @@
 #include <string.h>
 #include "insert.h"
 
-void extract_vpp(FILE *archiver)
+#define MAX_BUF_SIZE 1024
+
+file_metadata **read_headers(FILE *archiver, int num_of_files)
 {
-    rewind(archiver);
-
-    // read archiver file
-
-    file_metadata *header_read = initialize_header();
-
-    int num_of_files = 0;
-    fread(&num_of_files, sizeof(int), 1, archiver);
-
-    printf("%d from reading...\n", num_of_files);
-
-    // store into array of files_metada
     file_metadata **headers = malloc(sizeof(file_metadata *) * num_of_files);
 
     for (int i = 0; i < num_of_files; i++)
     {
+        file_metadata *header_read = initialize_header();
         fread(header_read, sizeof(file_metadata), 1, archiver);
         headers[i] = header_read;
         print_header(headers[i]);
     }
 
-    //     // char *new_file_name = malloc(sizeof(char) * strlen(headers[i]->name) + 4);
-    //     // strcpy(new_file_name, headers[i]->name);
-    //     // strcat(new_file_name, "new");
+    return headers;
+}
 
-    //     // printf("%s\n", new_file_name);
-    //     // FILE *file = fopen(new_file_name, "wb+");
-    //     // unsigned int size = headers[i]->size;
+void extract_vpp(FILE *archiver)
+{
+    rewind(archiver);
 
-    //     // char *buffer = malloc(sizeof(char) * 1024);
+    // read archiver file
+    int num_of_files = 0;
+    fread(&num_of_files, sizeof(int), 1, archiver);
 
-    //     // while (size > 0)
-    //     // {
-    //     //     int read_size = fread(buffer, sizeof(char), 1024, archiver);
-    //     //     fwrite(buffer, sizeof(char), read_size, file);
-    //     //     size -= read_size;
-    //     // }
-    // }
+    // store into array of files_metada
+    file_metadata **headers = read_headers(archiver, num_of_files);
+
+    // extract files
+    for (int i = 0; i < num_of_files; i++)
+    {
+        file_metadata *header = headers[i];
+        char *new_file_name = malloc(sizeof(char) * strlen(header->name) + 4);
+        strcpy(new_file_name, "new");
+        strcat(new_file_name, header->name);
+
+        FILE *file = fopen(new_file_name, "wb+");
+        int size = header->size;
+
+        char *buffer = malloc(sizeof(char) * MAX_BUF_SIZE);
+
+        while (size > 0)
+        {
+            if (size < MAX_BUF_SIZE)
+            {
+                fread(buffer, sizeof(char), size, archiver);
+                fwrite(buffer, sizeof(char), size, file);
+                break;
+            }
+            else
+            {
+                fread(buffer, sizeof(char), MAX_BUF_SIZE, archiver);
+                fwrite(buffer, sizeof(char), MAX_BUF_SIZE, file);
+            }
+            size -= MAX_BUF_SIZE;
+        }
+    }
 }
 
 int main(void)
