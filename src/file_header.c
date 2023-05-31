@@ -21,6 +21,8 @@ file_metadata *initialize_header()
         exit(1);
     }
 
+    memset(header, 0, sizeof(file_metadata));
+
     header->name = NULL;
     header->uid = 0;
     header->permissions = 0;
@@ -51,6 +53,13 @@ void insert_header(file_metadata *header, char *location, char *filename, unsign
     stat(filename, &file_stat);
 
     char *name = malloc(sizeof(char) * strlen(filename) + 1);
+
+    if (name == NULL)
+    {
+        printf("Error allocating memory for header name\n");
+        exit(1);
+    }
+
     strcpy(name, filename);
     header->name = name;
     header->uid = file_stat.st_uid;

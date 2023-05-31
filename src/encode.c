@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "file_header.h"
 
 #define MAX_BUF_SIZE 1024
@@ -16,6 +17,8 @@ void create_files(unsigned int files_count, char **file_names, FILE *archiver)
       printf("Error allocating memory for buffer\n");
       exit(1);
     }
+
+    memset(buffer, 0, sizeof(char) * MAX_BUF_SIZE);
 
     int size = 0;
 
@@ -48,13 +51,12 @@ void encode(char *vina_filename)
   for (unsigned int i = 0; i < files_count; i++)
   {
     insert_header(header, "./", file_names[i], i + 1); // TODO: get file path from command line
-    print_header(header);
     fwrite(header, sizeof(file_metadata), 1, archiver);
   }
 
-  free(header);
-
   create_files(files_count, file_names, archiver);
+
+  free(header);
 
   fclose(archiver);
 }
