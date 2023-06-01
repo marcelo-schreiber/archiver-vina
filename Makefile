@@ -17,8 +17,7 @@ CC=gcc
 CFLAGS=-c         \
          -W         \
          -Wall      \
-		 -I ./include \
-		 -std=c99   \
+		 		 -std=c99   \
 
 # Command used at clean target
 RM = rm -rf
