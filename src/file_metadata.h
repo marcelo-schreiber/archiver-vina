@@ -3,8 +3,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <time.h>
-// Uma abordagem interessante consiste em colocar a área de diretório no final do archive, mantendo no início do deste apenas um inteiro indicando a posição do archive onde inicia essa área.
-// Essa organização torna mais simples as operações de alteração do conteúdo do arquivo
 
 typedef struct file
 {
@@ -17,6 +15,8 @@ typedef struct file
     char *location;
 
 } file_metadata;
+
+#define MAX_BUF_SIZE 1024
 
 file_metadata *initialize_header();
 void insert_header(file_metadata *header, char *location, char *filename, unsigned int order);

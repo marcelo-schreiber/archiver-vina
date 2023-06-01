@@ -1,9 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "file_header.h"
-
-#define MAX_BUF_SIZE 1024
+#include "file_metadata.h"
 
 void create_files(unsigned int files_count, char **file_names, FILE *archiver)
 {
@@ -30,7 +28,7 @@ void create_files(unsigned int files_count, char **file_names, FILE *archiver)
   }
 }
 
-void encode(char *vina_filename)
+void pack(char *vina_filename)
 {
   FILE *archiver = fopen(vina_filename, "wb+");
 

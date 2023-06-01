@@ -1,9 +1,9 @@
-#include "decode.h"
-#include "encode.h"
+#include "unpack.h"
+#include "pack.h"
 
 int main(void)
 {
-    encode("vina.vpp");
-    decode("vina.vpp");
+    pack("vina.vpp");
+    unpack("vina.vpp");
     return 0;
 }

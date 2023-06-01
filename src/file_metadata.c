@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "file_header.h"
+#include "file_metadata.h"
 // insert into executable archiver
 
 // área de diretório contém informações sobre os membros do archive

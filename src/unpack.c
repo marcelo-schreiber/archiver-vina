@@ -1,9 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "file_header.h"
-
-#define MAX_BUF_SIZE 1024
+#include "file_metadata.h"
 
 #define min(a, b) ((a) < (b) ? (a) : (b))
 
@@ -54,7 +52,7 @@ void extract_vpp(FILE *archiver)
     }
 
     // TODO: remove this
-    strcpy(new_file_name, "new_");            // new file name will be new_<original_file_name>
+    strncpy(new_file_name, "new_", 5);        // add "new_" to the beginning of the file name
     strcat(new_file_name, curr_header->name); // concatenate the original file name to the new file name
 
     FILE *output_file = fopen(new_file_name, "wb+");
@@ -95,7 +93,7 @@ void extract_vpp(FILE *archiver)
   free(headers);
 }
 
-void decode(char *vina_filename)
+void unpack(char *vina_filename)
 {
   FILE *archiver = fopen(vina_filename, "rb");
 
