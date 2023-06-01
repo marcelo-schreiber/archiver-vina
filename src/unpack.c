@@ -1,10 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include "file_metadata.h"
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX_BUF_SIZE 1024
+#define CURRENT_DIRECTORY "./"
 
 file_metadata **create_header_array(FILE *archiver, int num_of_files)
 {
@@ -37,6 +41,7 @@ void extract_vpp(FILE *archiver)
 
   file_metadata **headers = create_header_array(archiver, num_of_files);
 
+  char *root_of_vpp_directory = getcwd(NULL, 0);
   // extract files
   for (unsigned int i = 0; i < num_of_files; i++)
   {
@@ -53,6 +58,19 @@ void extract_vpp(FILE *archiver)
     // TODO: remove this
     strncpy(new_file_name, "new_", 5);        // add "new_" to the beginning of the file name
     strcat(new_file_name, curr_header->name); // concatenate the original file name to the new file name
+
+    char *file_path = curr_header->location;
+
+    if (file_path == NULL)
+      file_path = CURRENT_DIRECTORY;
+
+    mkdir(file_path, curr_header->permissions);
+
+    if (chdir(file_path) != 0)
+    {
+      printf("Error changing directory\n");
+      exit(1);
+    }
 
     FILE *output_file = fopen(new_file_name, "wb+");
 
@@ -89,6 +107,13 @@ void extract_vpp(FILE *archiver)
       header_size -= MAX_BUF_SIZE;
     }
 
+    // change directory back to the original directory
+    if (chdir(root_of_vpp_directory) != 0)
+    {
+      printf("Error changing directory back to original\n");
+      exit(1);
+    }
+
     free(buffer);
     free(new_file_name);
     fclose(output_file);
@@ -97,6 +122,7 @@ void extract_vpp(FILE *archiver)
     free(curr_header);
   }
 
+  free(root_of_vpp_directory);
   free(headers);
 }
 

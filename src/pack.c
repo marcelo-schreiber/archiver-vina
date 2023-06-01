@@ -5,7 +5,7 @@
 
 #define MAX_BUF_SIZE 1024
 
-void create_files(unsigned int files_count, char **file_names, FILE *archiver)
+void write_files_contents_to_archiver(unsigned int files_count, char **file_names, FILE *archiver)
 {
   for (unsigned int i = 0; i < files_count; i++)
   {
@@ -44,17 +44,17 @@ void pack(char *vina_filename)
 
   unsigned int files_count = 2; // TODO: read from command line
 
-  fwrite(&files_count, sizeof(int), 1, archiver);
+  fwrite(&files_count, sizeof(unsigned int), 1, archiver);
 
   file_metadata *header = initialize_header();
 
   for (unsigned int i = 0; i < files_count; i++)
   {
-    insert_header(header, "./", file_names[i], i + 1); // TODO: get file path from command line
+    insert_header(header, "./pasta/", file_names[i], i + 1); // TODO: get file path from command line
     fwrite(header, sizeof(file_metadata), 1, archiver);
   }
 
-  create_files(files_count, file_names, archiver);
+  write_files_contents_to_archiver(files_count, file_names, archiver);
 
   free(header);
 
