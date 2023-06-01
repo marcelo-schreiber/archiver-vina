@@ -16,8 +16,6 @@ typedef struct file
 
 } file_metadata;
 
-#define MAX_BUF_SIZE 1024
-
 file_metadata *initialize_header();
 void insert_header(file_metadata *header, char *location, char *filename, unsigned int order);
 void print_header(file_metadata *header);

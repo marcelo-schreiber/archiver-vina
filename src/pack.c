@@ -3,6 +3,8 @@
 #include <string.h>
 #include "file_metadata.h"
 
+#define MAX_BUF_SIZE 1024
+
 void create_files(unsigned int files_count, char **file_names, FILE *archiver)
 {
   for (unsigned int i = 0; i < files_count; i++)
