@@ -50,7 +50,29 @@ void free_header(file_metadata *header)
 void insert_header(file_metadata *header, char *location, char *filename, unsigned int order)
 {
     struct stat file_stat;
+
+    // go within location
+    char *before_dir = getcwd(NULL, 0);
+
+    if (before_dir == NULL)
+    {
+        printf("Error getting current directory\n");
+        exit(1);
+    }
+
+    if (chdir(location) == -1)
+    {
+        printf("Error changing directory\n");
+        exit(1);
+    }
+
     stat(filename, &file_stat);
+
+    if (chdir(before_dir) == -1)
+    {
+        printf("Error changing directory\n");
+        exit(1);
+    }
 
     char *name = malloc(sizeof(char) * strlen(filename) + 1);
 

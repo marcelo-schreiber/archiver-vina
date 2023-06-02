@@ -17,6 +17,9 @@ CC=gcc
 CFLAGS=-c         \
          -W         \
          -Wall      \
+				 -g 			 \
+				 -ansi      \
+				 -pedantic  \
 		 		 -std=c99   \
 
 # Command used at clean target

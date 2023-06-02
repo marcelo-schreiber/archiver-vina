@@ -102,6 +102,7 @@ void extract_vpp(FILE *archiver)
       int curr_buffer_size = MIN(header_size, MAX_BUF_SIZE);
 
       fread(buffer, sizeof(char), curr_buffer_size, archiver);
+
       fwrite(buffer, sizeof(char), curr_buffer_size, output_file);
 
       header_size -= MAX_BUF_SIZE;
