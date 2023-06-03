@@ -12,15 +12,9 @@
 
 void read_file_metadata_from_archiver(file_metadata *header, FILE *archiver)
 {
-  // char *name;
-  // uid_t uid;
-  // mode_t permissions;
-  // off_t size;
-  // time_t date;
-  // unsigned int order;
-  // char *location;
   unsigned int name_length = 0;
   unsigned int location_length = 0;
+
   fread(&name_length, sizeof(unsigned int), 1, archiver);
   header->name = malloc(sizeof(char) * name_length + 1);
   fread(header->name, sizeof(char), name_length, archiver);
@@ -36,8 +30,6 @@ void read_file_metadata_from_archiver(file_metadata *header, FILE *archiver)
   header->location = malloc(sizeof(char) * location_length + 1);
   fread(header->location, sizeof(char), location_length, archiver);
   header->location[location_length] = '\0';
-
-  print_header(header);
 }
 
 file_metadata **create_header_array(FILE *archiver, int num_of_files)
@@ -149,8 +141,7 @@ void extract_vpp(FILE *archiver)
     free(new_file_name);
     fclose(output_file);
 
-    free(curr_header->name);
-    free(curr_header);
+    free_header(curr_header);
   }
 
   free(root_of_vpp_directory);

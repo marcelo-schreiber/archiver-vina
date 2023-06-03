@@ -47,7 +47,7 @@ void free_header(file_metadata *header)
     free(header);
 }
 
-void insert_header(file_metadata *header, char *location, char *filename, unsigned int order)
+void insert_header(file_metadata *header, char *location_without_filename, char *filename, unsigned int order)
 {
     struct stat file_stat;
 
@@ -60,7 +60,7 @@ void insert_header(file_metadata *header, char *location, char *filename, unsign
         exit(1);
     }
 
-    if (chdir(location) == -1)
+    if (chdir(location_without_filename) == -1)
     {
         printf("Error changing directory\n");
         exit(1);
@@ -74,6 +74,8 @@ void insert_header(file_metadata *header, char *location, char *filename, unsign
         exit(1);
     }
 
+    free(before_dir);
+
     char *name = malloc(sizeof(char) * strlen(filename) + 1);
 
     if (name == NULL)
@@ -82,7 +84,16 @@ void insert_header(file_metadata *header, char *location, char *filename, unsign
         exit(1);
     }
 
+    char *location = malloc(sizeof(char) * strlen(location_without_filename) + 1);
+
+    if (location == NULL)
+    {
+        printf("Error allocating memory for header location\n");
+        exit(1);
+    }
+
     strcpy(name, filename);
+    strcpy(location, location_without_filename);
     header->name = name;
     header->uid = file_stat.st_uid;
     header->permissions = file_stat.st_mode;

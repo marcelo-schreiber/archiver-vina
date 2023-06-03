@@ -3,7 +3,7 @@
 
 int main(void)
 {
-    // new_pack("vina.vpp", (char *[]){"./pastas/LEIAME.md", "./pastas/.gitignore"}, 2);
+    // new_pack("vina.vpp", (char *[]){"./LEIAME.md", "./.gitignore"}, 2);
     unpack("vina.vpp");
 
     return 0;

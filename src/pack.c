@@ -93,6 +93,8 @@ void new_pack(char *vina_filename, char *file_names_with_path[], unsigned int fi
     write_file_metadata_to_archiver(header, archiver);
 
     free(path);
+    free(header->name);
+    free(header->location);
   }
 
   read_files_contents_and_write_to_archiver(files_count, file_names_with_path, archiver);
