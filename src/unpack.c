@@ -10,6 +10,36 @@
 #define MAX_BUF_SIZE 1024
 #define CURRENT_DIRECTORY "./"
 
+void read_file_metadata_from_archiver(file_metadata *header, FILE *archiver)
+{
+  // char *name;
+  // uid_t uid;
+  // mode_t permissions;
+  // off_t size;
+  // time_t date;
+  // unsigned int order;
+  // char *location;
+  unsigned int name_length = 0;
+  unsigned int location_length = 0;
+  fread(&name_length, sizeof(unsigned int), 1, archiver);
+  header->name = malloc(sizeof(char) * name_length + 1);
+  fread(header->name, sizeof(char), name_length, archiver);
+  header->name[name_length] = '\0';
+  fread(&header->uid, sizeof(uid_t), 1, archiver);
+  fread(&header->permissions, sizeof(mode_t), 1, archiver);
+  fread(&header->size, sizeof(off_t), 1, archiver);
+  fread(&header->date, sizeof(time_t), 1, archiver);
+
+  fread(&header->order, sizeof(unsigned int), 1, archiver);
+  fread(&location_length, sizeof(unsigned int), 1, archiver);
+
+  header->location = malloc(sizeof(char) * location_length + 1);
+  fread(header->location, sizeof(char), location_length, archiver);
+  header->location[location_length] = '\0';
+
+  print_header(header);
+}
+
 file_metadata **create_header_array(FILE *archiver, int num_of_files)
 {
   file_metadata **headers = malloc(sizeof(file_metadata *) * num_of_files);
@@ -23,7 +53,7 @@ file_metadata **create_header_array(FILE *archiver, int num_of_files)
   for (int i = 0; i < num_of_files; i++)
   {
     file_metadata *header_read = initialize_header();
-    fread(header_read, sizeof(file_metadata), 1, archiver);
+    read_file_metadata_from_archiver(header_read, archiver);
     headers[i] = header_read;
 
     print_header(headers[i]);

@@ -5,6 +5,28 @@
 
 #define MAX_BUF_SIZE 1024
 
+void write_file_metadata_to_archiver(file_metadata *header, FILE *archiver)
+{
+  // char *name;
+  // uid_t uid;
+  // mode_t permissions;
+  // off_t size;
+  // time_t date;
+  // unsigned int order;
+  // char *location;
+  unsigned int name_length = strlen(header->name);
+  unsigned int location_length = strlen(header->location);
+  fwrite(&name_length, sizeof(unsigned int), 1, archiver);
+  fwrite(header->name, sizeof(char), name_length, archiver);
+  fwrite(&header->uid, sizeof(uid_t), 1, archiver);
+  fwrite(&header->permissions, sizeof(mode_t), 1, archiver);
+  fwrite(&header->size, sizeof(off_t), 1, archiver);
+  fwrite(&header->date, sizeof(time_t), 1, archiver);
+  fwrite(&header->order, sizeof(unsigned int), 1, archiver);
+  fwrite(&location_length, sizeof(unsigned int), 1, archiver);
+  fwrite(header->location, sizeof(char), strlen(header->location), archiver);
+}
+
 void read_files_contents_and_write_to_archiver(unsigned int files_count, char **file_names_with_path, FILE *archiver)
 {
   for (unsigned int i = 0; i < files_count; i++)
@@ -68,7 +90,7 @@ void new_pack(char *vina_filename, char *file_names_with_path[], unsigned int fi
     path[only_path_size] = '\0';                        // add '\0' to end of path variable
 
     insert_header(header, path, current_file_name, i + 1);
-    fwrite(header, sizeof(file_metadata), 1, archiver);
+    write_file_metadata_to_archiver(header, archiver);
 
     free(path);
   }
