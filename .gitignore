@@ -1,3 +1,10 @@
 .vscode
+
+# executables
 vina++
+
+# obj folder
 objects
+
+# archive
+vina.vpp
