@@ -136,7 +136,7 @@ void append_to_pack(char *vina_filename, char *file_names_with_path[], unsigned 
     exit(1);
   }
 
-  FILE *temp = fopen("temp.vpp", "wb+");
+  FILE *temp = tmpfile();
 
   if (temp == NULL)
   {
@@ -206,5 +206,23 @@ void append_to_pack(char *vina_filename, char *file_names_with_path[], unsigned 
 
   free(header);
 
+  fclose(archiver);
+
+  archiver = fopen(vina_filename, "wb+");
+
+  if (archiver == NULL)
+  {
+    printf("Error creating file\n");
+    exit(1);
+  }
+
+  rewind(temp);
+
+  while ((size = fread(buffer, sizeof(char), MAX_BUF_SIZE, temp)) > 0)
+    fwrite(buffer, sizeof(char), size, archiver);
+
+  free(buffer);
+
+  fclose(temp);
   fclose(archiver);
 }
