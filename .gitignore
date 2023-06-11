@@ -8,3 +8,7 @@ objects
 
 # archive
 vina.vpp
+backup.vpp
+
+# generated files from tests
+**/new_*
