@@ -38,6 +38,19 @@ $(PROJ_NAME): $(OBJ)
 objFolder:
 	@mkdir -p objects
  
+test:
+	./$(PROJ_NAME) -i backup.vpp ./tests/Lorem.txt ./tests/pixil-frame-0.png ./tests/nokia_standard.mp3
+	./$(PROJ_NAME) -x backup.vpp
+
+check:
+	diff -w ./tests/Lorem.txt ./tests/new_Lorem.txt
+	diff -w ./tests/pixil-frame-0.png ./tests/new_pixil-frame-0.png
+	diff -w ./tests/nokia_standard.mp3 ./tests/new_nokia_standard.mp3
+
+leak-check:
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(PROJ_NAME) -i backup.vpp ./tests/Lorem.txt ./tests/pixil-frame-0.png ./tests/nokia_standard.mp3
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(PROJ_NAME) -x backup.vpp
+
 clean:
 	$(RM) ./objects/*.o $(PROJ_NAME) *~
 
